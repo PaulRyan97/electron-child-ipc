@@ -1,0 +1,27 @@
+{
+  "name": "electron-child-ipc",
+  "version": "1.0.0",
+  "description": "A simple way to communicate between your electron main process and child processes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PaulRyan97/electron-child-ipc.git"
+  },
+  "keywords": [
+    "electron",
+    "ipc",
+    "child_process"
+  ],
+  "author": "Paul Ryan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PaulRyan97/electron-child-ipc/issues"
+  },
+  "homepage": "https://github.com/PaulRyan97/electron-child-ipc#readme",
+  "dependencies": {
+    "electron-promise-ipc": "^2.2.1"
+  }
+}
