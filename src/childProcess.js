@@ -11,11 +11,11 @@ childIPC.registerListeners = (handlers) => {
         {
             let listenerResult = handlerMap[message.id](...message.args);
 
-            process.send({id: message.requestId, data: listenerResult}, "success");
+            process.send({id: message.requestId, data: listenerResult, status: "success"});
         }
         catch (error)
         {
-            process.send({id: message.requestId, data: error}, "failure");
+            process.send({id: message.requestId, data: error, status: "failure" });
         }
     });
 };

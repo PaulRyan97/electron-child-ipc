@@ -1,7 +1,8 @@
-import mainProcess from "./mainProcess";
-import childProcess from "./childProcess";
+const mainProcess = require("./mainProcess");
+const childProcess = require("./childProcess");
+const renderProcess = require("./renderProcess");
 
 
 const childIPC = process.env.isChild ? childProcess : process.type === "renderer" ? renderProcess : mainProcess;
 
-export default childIPC;
+module.exports = childIPC;

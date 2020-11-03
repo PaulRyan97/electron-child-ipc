@@ -1,3 +1,5 @@
+const promiseIpc = require('electron-promise-ipc');
+
 const childIPC = {};
 
 childIPC.sendToChildProcess = (processID, request) => {

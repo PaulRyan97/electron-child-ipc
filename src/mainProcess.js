@@ -5,13 +5,21 @@ const childIPC = {};
 
 childIPC.createAndRegisterChildProcess = (id, modulePath, args) => {
 
-    const childProcess = fork(modulePath, args, { stdio: 'ipc', env: { isChild: 1 } });
+    const childProcess = fork(modulePath, args, { stdio: ['ipc'], env: { isChild: 1 } });
 
     let processRequests = [];
     let processRequestCount = 0;
 
     promiseIpc.on(id, (data) => {
-       return sendRequest(data.id, data.args)
+        return sendRequest(data.id, data.args)
+    });
+
+    childProcess.on('exit', function() {
+        console.log("Exited");
+    });
+
+    childProcess.stderr.on('data', function(data) {
+        console.log('stdout: ' + data);
     });
 
     const sendRequest = (messageID, args) =>
@@ -25,6 +33,7 @@ childIPC.createAndRegisterChildProcess = (id, modulePath, args) => {
                     requestId: request.id,
                     args: args
                 };
+            console.log(messageID);
             childProcess.send(message);
         });
     };
