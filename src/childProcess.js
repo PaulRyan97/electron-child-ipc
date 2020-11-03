@@ -1,9 +1,13 @@
 const childIPC = {};
 
+/**
+ * Registers the listeners to handle the communication between this process and the main process.
+ * @param handlers
+ */
 childIPC.registerListeners = (handlers) => {
     const handlerMap = {};
     handlers.forEach((handler) => {
-        handlerMap[handler.id] = handler.method;
+        handlerMap[handler.id] = handler.callback;
     });
 
     process.on('message', (message) => {

@@ -10,7 +10,7 @@ function createWindow () {
             nodeIntegration: true
         }
     })
-    console.log(childIpc);
+
     childIpc.createAndRegisterChildProcess('child1', path.join(__dirname, 'child.js'));
 
     win.loadFile('index.html')
