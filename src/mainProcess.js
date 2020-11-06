@@ -8,9 +8,10 @@ const childIPC = {};
  * between the main, renderer and child processes
  * @param id Unique string id to give to the child process
  * @param modulePath The module to run in the process.
- * @param args Additional arguments, see Node child_process documentation
+ * @param args Optional additional arguments, see Node child_process documentation
+ * @param onExit Optional function to run when the child process exits.
  */
-childIPC.createAndRegisterChildProcess = (id, modulePath, args) => {
+childIPC.createAndRegisterChildProcess = (id, modulePath, args, onExit) => {
 
     const childProcess = fork(modulePath, args, { stdio: ['ipc'], env: { isChild: 1 } });
 
@@ -60,6 +61,11 @@ childIPC.createAndRegisterChildProcess = (id, modulePath, args) => {
         }
         else {
             console.log(`Child process '${id} terminated with signal ${signal}`);
+        }
+        //Call the user defined exit function
+        if(onExit)
+        {
+            onExit();
         }
     });
 

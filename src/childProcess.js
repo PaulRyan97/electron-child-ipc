@@ -15,7 +15,17 @@ childIPC.registerListeners = (handlers) => {
         {
             let listenerResult = handlerMap[message.id](...message.args);
 
-            process.send({id: message.requestId, data: listenerResult, status: "success"});
+            //Check if result is a promise and handle accordingly
+            if(Promise.resolve(listenerResult) == listenerResult)
+            {
+                listenerResult.then((data) => {
+                    process.send({id: message.requestId, data: data, status: "success"});
+                });
+            }
+            else
+            {
+                process.send({id: message.requestId, data: listenerResult, status: "success"});
+            }
         }
         catch (error)
         {
