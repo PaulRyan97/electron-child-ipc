@@ -15,8 +15,8 @@ childIPC.createAndRegisterChildProcess = (id, modulePath, args, onExit) => {
 
     const childProcess = fork(modulePath, args, { stdio: ['ipc'], env: { isChild: 1 } });
 
-    let processRequests = [];
-    let processRequestCount = 0;
+    let pendingRequests = {};
+    let requestNum = 0;
 
     //Handle request for this process from the renderer
     promiseIpc.on(id, (data) => {
@@ -41,15 +41,16 @@ childIPC.createAndRegisterChildProcess = (id, modulePath, args, onExit) => {
 
     const createRequestObject = (resolve, reject) =>
     {
+        let requestIdPrefix = "req_";
         let request =
             {
-                id: processRequestCount,
+                id: requestIdPrefix + requestNum,
                 resolve: resolve,
                 reject: reject,
             };
         //Store the request reference for use when a response is received from the child process
-        processRequests.push(request);
-        processRequestCount++;
+        pendingRequests[request.id] = request;
+        requestNum++;
 
         return request;
     };
@@ -77,18 +78,22 @@ childIPC.createAndRegisterChildProcess = (id, modulePath, args, onExit) => {
     childProcess.on('message', (response) =>
     {
         //Find the promise the response id is referring to
-        let promiseToHandle = processRequests.find((request) => request.id === response.id);
-        //Return data to the rendered process
-        if (response.status === "failure")
+        let promiseToHandle = pendingRequests[response.id];
+
+        if(promiseToHandle)
         {
-            promiseToHandle.reject(response.data);
+            //Return data to the renderer process
+            if (response.status === "failure")
+            {
+                promiseToHandle.reject(response.data);
+            }
+            else
+            {
+                promiseToHandle.resolve(response.data);
+            }
+            //Remove that pending request
+            delete pendingRequests[response.id];
         }
-        else
-        {
-            promiseToHandle.resolve(response.data);
-        }
-        //Remove that request from the array
-        processRequests = processRequests.filter((request) => request.id !== promiseToHandle.id);
     });
 };
 
