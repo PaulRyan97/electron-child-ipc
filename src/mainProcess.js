@@ -18,28 +18,26 @@ childIPC.createAndRegisterChildProcess = (id, modulePath, args, onExit) => {
     let pendingRequests = {};
     let requestNum = 0;
 
-    //Handle request for this process from the renderer
-    promiseIpc.on(id, (data) => {
-        return sendRequest(data.id, data.args)
-    });
-
-    const sendRequest = (messageID, args) =>
+    const sendRequest = (data) =>
     {
         return new Promise((resolve, reject) =>
         {
-            let request = createRequestObject(resolve, reject);
+            let request = createRequestObject(resolve, reject, data.timeout);
             let message =
                 {
-                    id: messageID,
+                    id: data.id,
                     requestId: request.id,
-                    args: args
+                    args: data.args
                 };
 
             childProcess.send(message);
         });
     };
 
-    const createRequestObject = (resolve, reject) =>
+    //Handle request for this process from the renderer
+    promiseIpc.on(id, sendRequest);
+
+    const createRequestObject = (resolve, reject, timeout) =>
     {
         let requestIdPrefix = "req_";
         let request =
@@ -48,6 +46,13 @@ childIPC.createAndRegisterChildProcess = (id, modulePath, args, onExit) => {
                 resolve: resolve,
                 reject: reject,
             };
+
+        if(timeout) {
+            request.timeoutHandler = setTimeout(() => {
+                reject(new Error("Request timed out waiting for response"));
+                delete pendingRequests[request.id];
+            }, timeout);
+        }
         //Store the request reference for use when a response is received from the child process
         pendingRequests[request.id] = request;
         requestNum++;
