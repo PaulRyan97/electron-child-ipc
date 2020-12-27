@@ -19,13 +19,21 @@ childIpc.createAndRegisterChildProcess('child1', path.join(__dirname, 'child.js'
 In the module used for your child process, set up the listeners for calls from the main process. The callback also supports async functions.
 ```js
 //Child process
-const childIpc = require('electron-child-ipc')
+const childIpc = require('electron-child-ipc');
 
 let handlers = [
     {
-        id: 'test', 
-        callback: () => { return 'request received and responded'}
-    }
+        id: 'test',
+        callback: () => 'Request received and responded to'
+    },
+    {
+        id: 'test2',
+        callback: () => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => resolve("Asynchronous call returned"), 3000);
+            });
+        }
+    },
 ];
 
 childIpc.registerListeners(handlers);
@@ -38,7 +46,12 @@ const childIpc = require('electron-child-ipc');
 
 childIpc.sendToChildProcess('child1', {id: 'test', args: []}).then((result) => {
     console.log(result);
-    //Expected result: "request received and responded"
+    //Expected result "Request received and responded to"
+});
+
+childIpc.sendToChildProcess('child1', {id: 'test2', args: []}).then((result) => {
+    console.log(result);
+    //Expected result "Asynchronous call returned"
 });
 ```
 ## Licence
