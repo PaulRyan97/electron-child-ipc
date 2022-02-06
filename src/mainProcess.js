@@ -47,7 +47,8 @@ childIPC.createAndRegisterChildProcess = (id, modulePath, args, onExit) => {
                 reject: reject,
             };
 
-        if(timeout) {
+        if(timeout) 
+        {
             request.timeoutHandler = setTimeout(() => {
                 reject(new Error("Request timed out waiting for response"));
                 delete pendingRequests[request.id];
