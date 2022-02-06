@@ -23,7 +23,7 @@ childIPC.createAndRegisterChildProcess = (id, modulePath, args, onExit) => {
         return new Promise((resolve, reject) =>
         {
             let request = createRequestObject(resolve, reject, data.timeout);
-            let message =
+            const message =
                 {
                     id: data.id,
                     requestId: request.id,
@@ -39,7 +39,7 @@ childIPC.createAndRegisterChildProcess = (id, modulePath, args, onExit) => {
 
     const createRequestObject = (resolve, reject, timeout) =>
     {
-        let requestIdPrefix = "req_";
+        const requestIdPrefix = "req_";
         let request =
             {
                 id: requestIdPrefix + requestNum,
@@ -47,7 +47,8 @@ childIPC.createAndRegisterChildProcess = (id, modulePath, args, onExit) => {
                 reject: reject,
             };
 
-        if(timeout) {
+        if(timeout) 
+        {
             request.timeoutHandler = setTimeout(() => {
                 reject(new Error("Request timed out waiting for response"));
                 delete pendingRequests[request.id];
